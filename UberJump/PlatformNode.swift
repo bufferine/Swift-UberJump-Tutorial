@@ -32,6 +32,6 @@ class PlatformNode: GameObjectNode{
         return false
     }
 }
-enum PlatformType{
-    case PLATFORM_NORMAL, PLATFORM_BREAK
+enum PlatformType : Int{
+    case PLATFORM_NORMAL = 0, PLATFORM_BREAK
 }

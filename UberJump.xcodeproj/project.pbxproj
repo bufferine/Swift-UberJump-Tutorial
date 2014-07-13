@@ -59,6 +59,7 @@
 		19518659196F0DC900BC124F /* GameObjectNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19518658196F0DC900BC124F /* GameObjectNode.swift */; };
 		1951865B196F16AE00BC124F /* StarNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1951865A196F16AE00BC124F /* StarNode.swift */; };
 		19518661196F2A6200BC124F /* PlatformNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19518660196F2A6200BC124F /* PlatformNode.swift */; };
+		19518663196F2C4D00BC124F /* Level01.plist in Resources */ = {isa = PBXBuildFile; fileRef = 19518662196F2C4D00BC124F /* Level01.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -128,6 +129,7 @@
 		19518658196F0DC900BC124F /* GameObjectNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameObjectNode.swift; sourceTree = "<group>"; };
 		1951865A196F16AE00BC124F /* StarNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StarNode.swift; sourceTree = "<group>"; };
 		19518660196F2A6200BC124F /* PlatformNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlatformNode.swift; sourceTree = "<group>"; };
+		19518662196F2C4D00BC124F /* Level01.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Level01.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -176,6 +178,7 @@
 				1951865A196F16AE00BC124F /* StarNode.swift */,
 				195185E6196EA50200BC124F /* GameViewController.swift */,
 				195185E8196EA50200BC124F /* Main.storyboard */,
+				19518662196F2C4D00BC124F /* Level01.plist */,
 				195185EB196EA50200BC124F /* Images.xcassets */,
 				19518601196EA94A00BC124F /* Assets.atlas */,
 				19518602196EA94A00BC124F /* Backgrounds */,
@@ -366,6 +369,7 @@
 				1951864E196EA94A00BC124F /* Background16@2x.png in Resources */,
 				19518640196EA94A00BC124F /* Background9@2x.png in Resources */,
 				19518644196EA94A00BC124F /* Background11@2x.png in Resources */,
+				19518663196F2C4D00BC124F /* Level01.plist in Resources */,
 				1951863C196EA94A00BC124F /* Background7@2x.png in Resources */,
 				19518651196EA94A00BC124F /* Background18.png in Resources */,
 				19518635196EA94A00BC124F /* Background4.png in Resources */,

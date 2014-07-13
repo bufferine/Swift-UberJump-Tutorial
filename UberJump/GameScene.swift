@@ -36,17 +36,66 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.backgroundColor = SKColor.whiteColor()
         backgroundNode = createBackgroundNode()
         self.addChild(backgroundNode)
+        midgroundNode = createMidgroundNode()
+        self.addChild(midgroundNode)
+        
         foregroundNode = SKNode()
         self.addChild(foregroundNode)
         
         hudNode = SKNode()
         self.addChild(hudNode)
         
-        let platform = createPlatformAtPosition(CGPointMake(160, 320), type: PlatformType.PLATFORM_NORMAL)
-        foregroundNode.addChild(platform)
+        let levelPlist = NSBundle.mainBundle().pathForResource("Level01", ofType:"plist")
+        let levelData = NSDictionary(contentsOfFile:levelPlist)
+        endLevelY = levelData.objectForKey("EndY") as Int
         
-        let star = createStarAtPosition(CGPointMake(160, 220), type:StarType.STAR_SPECIAL)
-        foregroundNode.addChild(star)
+        
+        // there's gonna be a swifter way to do this.
+        let platforms = levelData.objectForKey("Platforms") as NSDictionary
+        
+        let platformPatterns = platforms.objectForKey("Patterns") as NSDictionary
+        
+        let platformPositions = platforms.objectForKey("Positions") as NSArray
+        
+        for platformPosition in platformPositions{
+            let position = platformPosition as NSDictionary
+            let patternX = position.objectForKey("x") as Float
+            let patternY = position.objectForKey("y") as Float
+            let pattern = platformPosition.objectForKey("pattern") as String
+            let platformPattern = platformPatterns.objectForKey(pattern) as NSArray
+            for platformPointer in platformPattern {
+                let platformPoint = platformPointer as NSDictionary
+                let x = platformPoint.objectForKey("x") as Float
+                let y = platformPoint.objectForKey("y") as Float
+                let type = PlatformType.fromRaw(platformPoint.objectForKey("type") as Int)
+                let platformNode = self.createPlatformAtPosition(CGPointMake(x + patternX, y + patternY), type: type!)
+                foregroundNode.addChild(platformNode)
+            }
+        }
+        
+        let stars = levelData.objectForKey("Stars") as NSDictionary
+        
+        let starPatterns = stars.objectForKey("Patterns") as NSDictionary
+        
+        let starPositions = stars.objectForKey("Positions") as NSArray
+        
+        for starPosition in starPositions{
+            let position = starPosition as NSDictionary
+            let patternX = position.objectForKey("x") as Float
+            let patternY = position.objectForKey("y") as Float
+            let pattern = starPosition.objectForKey("pattern") as String
+            println("pattern \(pattern)")
+            let starPattern = starPatterns.objectForKey(pattern) as NSArray
+            
+            for starPointer in starPattern {
+                let starPoint = starPointer as NSDictionary
+                let x = starPoint.objectForKey("x") as Float
+                let y = starPoint.objectForKey("y") as Float
+                let type = StarType.fromRaw(starPoint.objectForKey("type") as Int)
+                let starNode = self.createStarAtPosition(CGPointMake(x + patternX, y + patternY), type: type!)
+                foregroundNode.addChild(starNode)
+            }
+        }
         
         player = createPlayer()
         foregroundNode.addChild(player)
@@ -59,14 +108,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.physicsWorld.contactDelegate = self
         
         
+
+        
     }
     
     func createBackgroundNode() -> SKNode{
-        println("CreateBagcorunwer")
         let backgroundNode = SKNode()
         for var nodeCount = 0; nodeCount < 20; ++nodeCount {
             let backgroundImageName = "Background\(nodeCount+1)"
-            println("Adding background " + backgroundImageName)
 
             let node = SKSpriteNode(imageNamed:backgroundImageName)
             node.anchorPoint = CGPointMake(0.5, 0.0)
@@ -76,7 +125,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         return backgroundNode
     }
     let backgroundNode:SKNode!
-//    let midgroundNode
+    let midgroundNode:SKNode!
     let foregroundNode:SKNode!
     let hudNode:SKNode!
     let player:SKNode!
@@ -154,5 +203,115 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         node.physicsBody.collisionBitMask = 0
         return node
     }
+    
+    let endLevelY:Int!
+    
+    func createMidgroundNode() -> SKNode {
+        let midgroundNode = SKNode()
+        for index in 0 .. 10 {
+            var spriteName:String!
+            let r = arc4random() % 2
+            if r > 0 {
+                spriteName = "BranchRight"
+            }else{
+                spriteName = "BranchLeft"
+            }
+            let branchNode = SKSpriteNode(imageNamed:spriteName)
+            branchNode.position = CGPointMake(160.0, 500.0 * Float(index))
+            midgroundNode.addChild(branchNode)
+        }
+        return midgroundNode
+    }
+    
+
+    
+    override func update(currentTime:CFTimeInterval) {
+        if (player.position.y > 200.0){
+            backgroundNode.position = CGPointMake(0.0, -((player.position.y - 200.0)/10))
+            midgroundNode.position = CGPointMake(0.0, -((player.position.y - 200.0)/4))
+            foregroundNode.position = CGPointMake(0.0, -((player.position.y - 200.0)))
+        }
+    }
+    
+    func rwAdd(a:CGPoint, b:CGPoint) -> CGPoint {
+        return CGPointMake(a.x + b.x, a.y + b.y)
+    }
+    func rwSubtract(a:CGPoint, b:CGPoint) -> CGPoint {
+        return CGPointMake(a.x - b.x, a.y - b.y)
+    }
+    func rwMultiply(a:CGPoint, f:Float) -> CGPoint {
+        return CGPointMake(a.x * f, a.y * f)
+    }
+    func rwLength(a:CGPoint) -> Float{
+        return sqrtf(a.x * a.x + a.y * a.y)
+    }
+    func rwNormalize(a:CGPoint) -> CGPoint{
+        let length = rwLength(a)
+        return CGPointMake(a.x / length, a.y / length)
+    }
+    
+    override func touchesEnded(touches: NSSet!, withEvent event: UIEvent!) {
+        let touch = touches.anyObject() as UITouch
+        let location = touch.locationInNode(self)
+        
+        println("touch at \(location)")
+        println("player at \(player.position)")
+        
+        let boost = rwSubtract(location, b:player.position)
+        
+        println("difference is  \(boost)" )
+        
+        let nBoost = rwNormalize(boost)
+        
+        println("normalized is \(nBoost)")
+        
+        // boost the player sideways by that much
+
+        player.physicsBody.applyForce(CGVectorMake(boost.x, 0))
+//        player.physicsBody.velocity = CGVectorMake(location.x - (self.size.width/2), player.physicsBody.velocity.dy)
+
+/*
+        let projectile = SKSpriteNode(imageNamed: "projectile")
+        projectile.position = self.player.position
+        let offset = rwSubtract(location, b:projectile.position)
+        if (offset.x <= 0) {return}
+        self.addChild(projectile)
+        let amount:Float = 1000
+        let direction = rwNormalize(offset)
+        let shootAmount = rwMultiply(direction, f:amount)
+        let realDest = rwAdd(shootAmount, b:projectile.position)
+        let velocity:Float = 480
+        let realMoveDuration:NSTimeInterval = NSTimeInterval(self.size.width / velocity)
+        let actionMove:SKAction = SKAction.moveTo(realDest, duration:realMoveDuration)
+        let actionMoveDone = SKAction.removeFromParent()
+        projectile.runAction(SKAction.sequence([actionMove, actionMoveDone]))
+*/
+    }
+
+    
+    override func didSimulatePhysics() {
+        if (player.position.x < -20.0){
+            player.position = CGPointMake(340.0, player.position.y)
+        }else if (player.position.x > 340.0){
+            player.position = CGPointMake(-20, player.position.y)
+        }
+    }
+    /*
+- (void) didSimulatePhysics
+{
+// 1
+// Set velocity based on x-axis acceleration
+_player.physicsBody.velocity = CGVectorMake(_xAcceleration * 400.0f, _player.physicsBody.velocity.dy);
+
+// 2
+// Check x bounds
+if (_player.position.x < -20.0f) {
+_player.position = CGPointMake(340.0f, _player.position.y);
+} else if (_player.position.x > 340.0f) {
+_player.position = CGPointMake(-20.0f, _player.position.y);
+}
+return;
+}*/
+
 }
 

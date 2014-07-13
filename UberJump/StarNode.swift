@@ -16,6 +16,6 @@ class StarNode: GameObjectNode {
         return true
     }
 }
-enum StarType {
-    case STAR_NORMAL, STAR_SPECIAL
+enum StarType : Int{
+    case STAR_NORMAL = 0, STAR_SPECIAL
 }
